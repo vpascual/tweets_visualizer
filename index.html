@@ -5,12 +5,23 @@
 <body>
 <div id="viz"></div>
 <script type="text/javascript">
-  d3.csv("retuitsxvisualitzar.csv", function(data) {
+  var fonts = {
+    'media': 'Times New Roman',
+    'politics': 'Times bold',
+    'ciudadana/o': 'Arial',
+    'entidades civiles': 'Arial bold',
+    'ciudadana/o': 'Rockwell',
+    'avatar': 'Rockwell bold',
+    'sin datos': 'Courier'
+  };
+
+  d3.csv("retuitsxvisualitzar-utf8.csv", function(data) {
     console.log(data);
     var scale = d3.scale.linear()
-                .domain([0, Math.log(14075)])
-                .range([8, 16]);
-    var color = d3.scale.category20();
+                .domain([0, d3.max(data, function(d) { return +d.Frecuencia; })]) // si canvies les dades, aqui es calcula el valor max de la columna Frecuencia automaticament
+                //.domain([0, d3.max(data, function(d) { return +d.Frecuencia; })]) // descomenta aquesta linia i comenta la de d'alt si vols fer servir escala logaritmica
+                .range([12, 20]);
+    var color = d3.scale.category20(); // els colors utilitzats els tens aqui https://github.com/mbostock/d3/wiki/Ordinal-Scales#category20
 
     d3.select("#viz")
       .selectAll("p")
@@ -18,14 +29,17 @@
       .enter()
       .append("p")
         .text(function(d) {
-          return d.Tweet;
+          return ' (' + +d.Frecuencia + ') ' + d.Tweet;
         })
         .style("font-size", function(d) {
-          console.log(scale(d.Frecuencia))
-          return scale(Math.log(d.Frecuencia))
+          return scale(+d.Frecuencia)
+          // return scale(Math.log(d.Frecuencia)); // descomenta aquesta linia i comenta la de d'alt si vols fer servir escala logaritmica
         })
         .style("color", function(d) {
           return color(d['Tipus tweet']);
+        })
+        .style("font-family", function(d) {
+          return fonts[d['Tipus user']];
         })
   })
 
